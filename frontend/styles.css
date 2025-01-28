@@ -170,3 +170,8 @@ body {
 .config-buttons button:hover {
     background-color: #0056b3;
 }
+
+.uploaded-image.selected {
+    border: 2px solid #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+}

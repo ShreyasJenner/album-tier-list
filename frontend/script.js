@@ -40,6 +40,7 @@ document.getElementById('file-input').addEventListener('change', function (event
     }
 });
 
+
 function allowDrop(event) {
     event.preventDefault();
 }
@@ -56,9 +57,37 @@ function drop(event) {
 
     // Ensure the drop target is the drop-zone
     if (dropZone.classList.contains('drop-zone')) {
-        dropZone.appendChild(draggedElement);
+        // Check if the dragged element already has a container (to avoid duplication)
+        let container = draggedElement.parentElement;
+        if (!container.classList.contains('image-container')) {
+            // Create a container div for the image
+            container = document.createElement('div');
+            container.classList.add('image-container');
+
+            // Add the dragged element (image) to the container
+            container.appendChild(draggedElement);
+
+            // Add tooltip with file name
+            const tooltip = document.createElement('span');
+            tooltip.classList.add('tooltip');
+            tooltip.textContent = draggedElement.getAttribute('alt') || "Uploaded Image";
+            container.appendChild(tooltip);
+
+            // Add remove button
+            const removeButton = document.createElement('button');
+            removeButton.classList.add('remove-button');
+            removeButton.textContent = 'X';
+            removeButton.onclick = function () {
+                container.remove(); // Remove the container
+            };
+            container.appendChild(removeButton);
+        }
+
+        // Append the container to the drop zone
+        dropZone.appendChild(container);
     }
 }
+
 
 // Save Configuration
 document.getElementById('save-config').addEventListener('click', function () {
@@ -148,3 +177,85 @@ document.getElementById('config-file-input').addEventListener('change', function
 
     reader.readAsText(file);
 });
+
+
+// code for bulk select
+let selectedImages = new Set();
+
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('uploaded-image')) {
+        // Handle multi-select with Shift or Ctrl
+        if (e.shiftKey || e.ctrlKey) {
+            if (selectedImages.has(e.target)) {
+                // Deselect image
+                selectedImages.delete(e.target);
+                e.target.classList.remove('selected'); // Highlight removal
+            } else {
+                // Select image
+                selectedImages.add(e.target);
+                e.target.classList.add('selected'); // Highlight addition
+            }
+        } else {
+            // Single select (clears previous selection)
+            selectedImages.forEach(img => img.classList.remove('selected'));
+            selectedImages.clear();
+
+            selectedImages.add(e.target);
+            e.target.classList.add('selected');
+        }
+    }
+});
+
+selectedImages.forEach(image => {
+    image.setAttribute('draggable', 'true');
+});
+
+
+document.querySelectorAll('.drop-zone').forEach(dropZone => {
+    dropZone.addEventListener('dragover', (e) => e.preventDefault());
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+
+        selectedImages.forEach(image => {
+            // Create a clone of the image (to keep the original intact for future operations)
+            const imageClone = image.cloneNode(true);
+            imageClone.classList.remove('selected');
+            
+            // Create the image container for the drop zone
+            const imgContainer = document.createElement('div');
+            imgContainer.classList.add('image-container');
+
+            // Append the cloned image to the image container
+            imgContainer.appendChild(imageClone);
+
+            // Create a tooltip for the image
+            const tooltip = document.createElement('span');
+            tooltip.classList.add('tooltip');
+            tooltip.textContent = image.alt || "Uploaded Image"; // Tooltip text
+            imgContainer.appendChild(tooltip);
+
+            // Create a remove button for the image
+            const removeButton = document.createElement('button');
+            removeButton.classList.add('remove-button');
+            removeButton.textContent = 'X';
+            removeButton.onclick = function () {
+                imgContainer.remove(); // Remove the image container when clicked
+            };
+            imgContainer.appendChild(removeButton);
+
+            // Append the image container to the drop zone
+            dropZone.appendChild(imgContainer);
+
+            // Remove the original image from the uploaded section
+            image.parentElement.remove();
+
+            // Remove the highlight after the drop
+            image.classList.remove('selected');
+        });
+
+        // Clear the selected images after drop
+        selectedImages.clear();
+    });
+});
+
