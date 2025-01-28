@@ -1,0 +1,151 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.upload-section {
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin: 10px;
+    padding: 10px;
+    width: 80%;
+    text-align: center;
+}
+
+.upload-section h2 {
+    margin: 0;
+    padding: 10px;
+    background-color: #eee;
+    border-radius: 5px;
+}
+
+.tier {
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin: 10px;
+    padding: 10px;
+    width: 80%;
+    text-align: center;
+}
+
+.tier h2 {
+    margin: 0;
+    padding: 10px;
+    background-color: #eee;
+    border-radius: 5px;
+}
+
+.drop-zone {
+    min-height: 100px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    margin-top: 10px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start; /* Align items to the top */
+}
+
+.drop-zone img {
+    max-width: 100px; /* Constrain image width */
+    max-height: 100px; /* Constrain image height */
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    cursor: grab;
+}
+
+.uploaded-images-section {
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin: 10px;
+    padding: 10px;
+    width: 80%;
+    text-align: center;
+}
+
+.uploaded-images-section h2 {
+    margin: 0;
+    padding: 10px;
+    background-color: #eee;
+    border-radius: 5px;
+}
+
+.uploaded-images {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* styles.css */
+.image-container {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+}
+
+.remove-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    display: none; /* Hidden by default */
+}
+
+.image-container:hover .remove-button {
+    display: block; /* Show on hover */
+}
+
+.tooltip {
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the image */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap; /* Prevent tooltip text from wrapping */
+}
+
+.image-container:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.uploaded-images img {
+    width: 100px;
+    height: 100px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    cursor: grab;
+}

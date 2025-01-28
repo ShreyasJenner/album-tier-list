@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tier Maker Clone</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- File Upload Section -->
+        <div class="upload-section">
+            <h2>Upload Images</h2>
+            <input type="file" id="file-input" accept="image/*" multiple>
+        </div>
+
+        <!-- Tiers -->
+        <div class="tier" id="tier-s">
+            <h2>S Tier</h2>
+            <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+        <div class="tier" id="tier-a">
+            <h2>A Tier</h2>
+            <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+        <div class="tier" id="tier-b">
+            <h2>B Tier</h2>
+            <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+        <div class="tier" id="tier-c">
+            <h2>C Tier</h2>
+            <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+
+        <!-- Uploaded Images Section -->
+        <div class="uploaded-images-section">
+            <h2>Uploaded Images</h2>
+            <div class="uploaded-images" id="uploaded-images"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
