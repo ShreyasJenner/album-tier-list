@@ -2,12 +2,14 @@ import spotipy
 import os
 import requests
 from spotipy.oauth2 import SpotifyOAuth
+import env
 
 # Set your Spotify API credentials and required scopes
-CLIENT_ID = ''
-CLIENT_SECRET = ''
-REDIRECT_URI = 'http://localhost:3000'
-SCOPE = 'user-library-read'
+CLIENT_ID = env.CLIENT_ID 
+CLIENT_SECRET = env.CLIENT_SECRET 
+REDIRECT_URI = env.REDIRECT_URI 
+SCOPE = env.SCOPE 
+
 
 # Authenticate using SpotifyOAuth
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID,
