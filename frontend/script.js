@@ -1,10 +1,23 @@
-// script.js
+// function to upload images and render them in upload area
 document.getElementById('file-input').addEventListener('change', function (event) {
     const files = event.target.files;
     const uploadedImagesContainer = document.getElementById('uploaded-images');
+    const existingImageNames = new Set();
+
+    // Collect all existing image names from uploaded area and tiers
+    document.querySelectorAll('.uploaded-image').forEach(img => {
+        existingImageNames.add(img.alt); // Use 'alt' as the unique identifier (file name)
+    });
 
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
+
+        // Check if the image already exists
+        if (existingImageNames.has(file.name)) {
+            console.warn(`Duplicate image skipped: ${file.name}`);
+            continue; // Skip duplicates
+        }
+
         const reader = new FileReader();
 
         reader.onload = function (e) {
@@ -13,7 +26,7 @@ document.getElementById('file-input').addEventListener('change', function (event
 
             const img = document.createElement('img');
             img.src = e.target.result;
-            img.alt = "Uploaded Image";
+            img.alt = file.name; // Use file name as unique identifier
             img.draggable = true;
             img.id = `uploaded-img-${Date.now()}-${i}`; // Unique ID for each uploaded image
             img.ondragstart = drag;
@@ -37,9 +50,11 @@ document.getElementById('file-input').addEventListener('change', function (event
         };
 
         reader.readAsDataURL(file);
+
+        // Add the file name to the set to track it as existing
+        existingImageNames.add(file.name);
     }
 });
-
 
 function allowDrop(event) {
     event.preventDefault();
