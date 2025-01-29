@@ -1,3 +1,7 @@
+### Simple Instructions
+- If on windows double click bat_script_for_a_dumbo.bat
+- For the manual route, read `Instructions to run the program`
+
 ### Instructions to run the program
 
 - Install the needed python packages
