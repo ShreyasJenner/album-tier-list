@@ -7,7 +7,6 @@ interface ImageContainerProps {
   image: { id: string; url: string; name: string; listened: boolean }
   onImageMove: (imageIds: string[], tierId: string | null) => void
   onToggleListened: (imageId: string) => void
-  currentTierId: string | null
   isSelected: boolean
   onToggleSelection: (imageId: string, isShiftKey: boolean) => void
   selection: { [key: string]: boolean }
@@ -17,7 +16,6 @@ const ImageContainer = memo(function ImageContainer({
   image,
   onImageMove,
   onToggleListened,
-  currentTierId,
   isSelected,
   onToggleSelection,
   selection,
