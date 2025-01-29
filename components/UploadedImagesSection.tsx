@@ -26,7 +26,6 @@ const UploadedImagesSection = memo(function UploadedImagesSection({
             image={image}
             onImageMove={onImageMove}
             onToggleListened={onToggleListened}
-            currentTierId={null}
             isSelected={selection[image.id] || false}
             onToggleSelection={onToggleSelection}
             selection={selection}
