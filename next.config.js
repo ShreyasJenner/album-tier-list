@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['localhost', 'https://album-tier-list-2zc87lry8-shreyasjenner4-gmailcoms-projects.vercel.app'],
+    domains: ['localhost', 'album-tier-list.vercel.app', 'vercel.app'],
     remotePatterns: [
       {
         protocol: 'https',
