@@ -4,6 +4,14 @@ body {
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#content {
+    flex: 1;
+    overflow-y: auto;
 }
 
 .container {
@@ -31,12 +39,17 @@ body {
 }
 
 .search-section {
+    position: sticky;
+    bottom: 0;
     width: 80%;
-    margin: 10px;
+    background-color: #fff;
+    z-index: 10;
+    padding: 10px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 #search-input {
-    width: 100%;
+    width: 98%;
     padding: 10px;
     border: 2px solid #ccc;
     border-radius: 8px;
@@ -187,3 +200,41 @@ body {
     border: 5px solid #007bff;
     background-color: rgba(0, 123, 255, 0.1);
 }
+
+.listened-button, .remove-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 24px;
+    text-align: center;
+    display: none;
+}
+
+.listened-button {
+    right: 30px;
+    background-color: gray;
+}
+
+.listened-button.listened {
+    background-color: green;
+}
+
+.image-container:hover .listened-button,
+.image-container:hover .remove-button {
+    display: block;
+}
+
+.uploaded-image.listened {
+    opacity: 0.6;
+    filter: grayscale(100%);
+    border: 3px solid green;
+}
+

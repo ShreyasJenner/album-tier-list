@@ -1,211 +1,260 @@
-// Function to upload images and render them in the upload area
-document.getElementById('file-input').addEventListener('change', function (event) {
-    const files = event.target.files;
-    const uploadedImagesContainer = document.getElementById('uploaded-images');
-    const existingImageNames = new Set();
+document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("file-input");
+    const uploadedImages = document.getElementById("uploaded-images");
+    const loadConfigButton = document.getElementById("load-config");
+    const saveConfigButton = document.getElementById("save-config");
+    const configFileInput = document.getElementById("config-file-input");
+    const searchInput = document.getElementById("search-input");
+    let selectedImages = new Set();
+    let uploadedImageMap = new Map();
 
-    // Collect all existing image names from uploaded area and tiers
-    document.querySelectorAll('.uploaded-image').forEach(img => {
-        existingImageNames.add(img.alt); // Use 'alt' as the unique identifier (file name)
+    // Add click handler for load button
+    loadConfigButton.addEventListener("click", function() {
+        configFileInput.click();
     });
 
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-
-        // Check if the image already exists
-        if (existingImageNames.has(file.name)) {
-            console.warn(`Duplicate image skipped: ${file.name}`);
-            continue; // Skip duplicates
+    fileInput.addEventListener("change", async function () {
+        const files = fileInput.files;
+        for (const file of files) {
+            if (!uploadedImageMap.has(file.name)) {
+                try {
+                    // Convert to compressed base64
+                    const compressedBase64 = await compressImage(file);
+                    createImageElement(compressedBase64, file.name);
+                } catch (error) {
+                    console.error("Error processing image:", error);
+                    alert(`Error processing image ${file.name}`);
+                }
+            } else {
+                console.log(`Image "${file.name}" already exists`);
+            }
         }
-
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-            const imgContainer = document.createElement('div');
-            imgContainer.classList.add('image-container');
-
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.alt = file.name; // Use file name as unique identifier
-            img.draggable = true;
-            img.id = `uploaded-img-${Date.now()}-${i}`; // Unique ID for each uploaded image
-            img.ondragstart = drag;
-            img.classList.add('uploaded-image');
-
-            const tooltip = document.createElement('span');
-            tooltip.classList.add('tooltip');
-            tooltip.textContent = file.name; // Set the file name as the tooltip text
-
-            const removeButton = document.createElement('button');
-            removeButton.classList.add('remove-button');
-            removeButton.textContent = 'X';
-            removeButton.onclick = function () {
-                imgContainer.remove(); // Remove the image container when the button is clicked
-            };
-
-            imgContainer.appendChild(img);
-            imgContainer.appendChild(tooltip);
-            imgContainer.appendChild(removeButton);
-            uploadedImagesContainer.appendChild(imgContainer);
-        };
-
-        reader.readAsDataURL(file);
-
-        // Add the file name to the set to track it as existing
-        existingImageNames.add(file.name);
-    }
-});
-
-// Search functionality
-document.getElementById('search-input').addEventListener('input', function (e) {
-    const searchTerm = e.target.value.toLowerCase(); // Get the search term
-    const images = document.querySelectorAll('.uploaded-image'); // Get all uploaded images
-
-    images.forEach(img => {
-        const fileName = img.alt.toLowerCase(); // Get the file name from the 'alt' attribute
-        const imageContainer = img.parentElement; // Get the parent container of the image
-
-        // Show or hide the image based on whether the file name matches the search term
-        if (fileName.includes(searchTerm)) {
-            imageContainer.style.display = 'inline-block'; // Show the image
-        } else {
-            imageContainer.style.display = 'none'; // Hide the image
-        }
+        fileInput.value = '';
     });
-});
 
-// Drag and drop functions
-function allowDrop(event) {
-    event.preventDefault();
-}
+    // Image compression function
+    async function compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    // Max dimension
+                    const MAX_DIMENSION = 800;
+                    if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                        if (width > height) {
+                            height = (height / width) * MAX_DIMENSION;
+                            width = MAX_DIMENSION;
+                        } else {
+                            width = (width / height) * MAX_DIMENSION;
+                            height = MAX_DIMENSION;
+                        }
+                    }
 
-function drag(event) {
-    event.dataTransfer.setData("text", event.target.id);
-}
-
-function drop(event) {
-    event.preventDefault();
-    const data = event.dataTransfer.getData("text");
-    const draggedElement = document.getElementById(data);
-    const dropZone = event.target;
-
-    // Ensure the drop target is the drop-zone
-    if (dropZone.classList.contains('drop-zone')) {
-        // Check if the dragged element already has a container (to avoid duplication)
-        let container = draggedElement.parentElement;
-        if (!container.classList.contains('image-container')) {
-            // Create a container div for the image
-            container = document.createElement('div');
-            container.classList.add('image-container');
-
-            // Add the dragged element (image) to the container
-            container.appendChild(draggedElement);
-
-            // Add tooltip with file name
-            const tooltip = document.createElement('span');
-            tooltip.classList.add('tooltip');
-            tooltip.textContent = draggedElement.getAttribute('alt') || "Uploaded Image";
-            container.appendChild(tooltip);
-
-            // Add remove button
-            const removeButton = document.createElement('button');
-            removeButton.classList.add('remove-button');
-            removeButton.textContent = 'X';
-            removeButton.onclick = function () {
-                container.remove(); // Remove the container
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Compress image
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    resolve(compressedBase64);
+                };
+                img.onerror = reject;
+                img.src = e.target.result;
             };
-            container.appendChild(removeButton);
-        }
-
-        // Append the container to the drop zone
-        dropZone.appendChild(container);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
     }
-}
 
-// Save and load configuration functions (unchanged)
-document.getElementById('save-config').addEventListener('click', function () {
-    const tiers = document.querySelectorAll('.tier');
-    const config = {};
-
-    tiers.forEach(tier => {
-        const tierId = tier.id;
-        const dropZone = tier.querySelector('.drop-zone');
-        const images = dropZone.querySelectorAll('.uploaded-image'); // Ensure class is correct for images
+    function createImageElement(src, name) {
+        const container = document.createElement("div");
+        container.classList.add("image-container");
         
-        // Collect image data dynamically
-        config[tierId] = Array.from(images).map(img => ({
-            src: img.src,
-            id: img.id,
-            alt: img.alt,
-            tooltip: img.nextElementSibling?.textContent || "" // Ensure tooltip text is captured
-        }));
-    });
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = name;
+        img.draggable = true;
+        img.classList.add("uploaded-image");
+        img.dataset.listened = "false";
+        
+        img.addEventListener("dragstart", handleDragStart);
+        img.addEventListener("click", toggleSelection);
+        img.addEventListener("dblclick", toggleListened);
+        
+        const removeButton = document.createElement("button");
+        removeButton.classList.add("remove-button");
+        removeButton.innerText = "✖";
+        removeButton.addEventListener("click", function () {
+            uploadedImageMap.delete(name);
+            container.remove();
+        });
+        
+        const tooltip = document.createElement("div");
+        tooltip.classList.add("tooltip");
+        tooltip.innerText = name;
+        
+        container.appendChild(tooltip);
+        container.appendChild(img);
+        container.appendChild(removeButton);
+        uploadedImages.appendChild(container);
 
-    const configJson = JSON.stringify(config, null, 2);
-    const blob = new Blob([configJson], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'tier-config.json';
-    a.click();
-    URL.revokeObjectURL(url);
-});
-
-document.getElementById('load-config').addEventListener('click', function () {
-    document.getElementById('config-file-input').click();
-});
-
-document.getElementById('config-file-input').addEventListener('change', function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const config = JSON.parse(e.target.result);
-        const tiers = document.querySelectorAll('.tier');
-
-        // Clear existing images from tiers
-        tiers.forEach(tier => {
-            tier.querySelector('.drop-zone').innerHTML = '';
+        uploadedImageMap.set(name, {
+            container: container,
+            src: src,
+            listened: false
         });
 
-        // Load images into tiers based on the configuration
-        for (const [tierId, images] of Object.entries(config)) {
-            const tier = document.getElementById(tierId);
-            if (!tier) continue;
+        container.addEventListener("mouseenter", function () {
+            tooltip.style.visibility = "visible";
+        });
+        container.addEventListener("mouseleave", function () {
+            tooltip.style.visibility = "hidden";
+        });
+    }
 
-            const dropZone = tier.querySelector('.drop-zone');
-            images.forEach(imageData => {
-                const imgContainer = document.createElement('div');
-                imgContainer.classList.add('image-container');
+    saveConfigButton.addEventListener("click", function () {
+        try {
+            const config = {
+                tiers: {
+                    S: getImagesInTier("tier-s"),
+                    A: getImagesInTier("tier-a"),
+                    B: getImagesInTier("tier-b"),
+                    C: getImagesInTier("tier-c")
+                }
+            };
 
-                const img = document.createElement('img');
-                img.src = imageData.src;
-                img.alt = imageData.alt;
-                img.draggable = true;
-                img.id = imageData.id;
-                img.ondragstart = drag;
-                img.classList.add('uploaded-image');
-
-                const tooltip = document.createElement('span');
-                tooltip.classList.add('tooltip');
-                tooltip.textContent = imageData.tooltip;
-
-                const removeButton = document.createElement('button');
-                removeButton.classList.add('remove-button');
-                removeButton.textContent = 'X';
-                removeButton.onclick = function () {
-                    imgContainer.remove();
-                };
-
-                imgContainer.appendChild(img);
-                imgContainer.appendChild(tooltip);
-                imgContainer.appendChild(removeButton);
-                dropZone.appendChild(imgContainer);
-            });
+            // Split into chunks if needed
+            const jsonStr = JSON.stringify(config);
+            downloadConfig(jsonStr, "tierlist-config.json");
+        } catch (error) {
+            console.error("Error saving configuration:", error);
+            alert("Error saving configuration. The file might be too large.");
         }
-    };
+    });
 
-    reader.readAsText(file);
+    function downloadConfig(jsonStr, filename) {
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function getImagesInTier(tierId) {
+        const tier = document.getElementById(tierId);
+        return Array.from(tier.querySelectorAll(".drop-zone img")).map(img => ({
+            src: img.src,
+            name: img.alt,
+            listened: img.dataset.listened === 'true'
+        }));
+    }
+
+    configFileInput.addEventListener("change", function () {
+        const file = configFileInput.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = async function (e) {
+            try {
+                const config = JSON.parse(e.target.result);
+                await restoreConfiguration(config);
+            } catch (error) {
+                console.error("Error loading configuration:", error);
+                alert("Error loading configuration file. Please make sure it's a valid JSON file and not too large.");
+            }
+        };
+        reader.readAsText(file);
+        configFileInput.value = '';
+    });
+
+    async function restoreConfiguration(config) {
+        clearAllTiers();
+
+        // Process each tier
+        for (const [tierId, images] of Object.entries(config.tiers)) {
+            const tier = document.getElementById(`tier-${tierId.toLowerCase()}`);
+            const dropZone = tier.querySelector(".drop-zone");
+
+            for (const image of images) {
+                if (!uploadedImageMap.has(image.name)) {
+                    createImageElement(image.src, image.name);
+                }
+                
+                const imageData = uploadedImageMap.get(image.name);
+                if (imageData) {
+                    const imgElement = imageData.container.querySelector('img');
+                    imgElement.dataset.listened = image.listened;
+                    imgElement.classList.toggle("listened", image.listened);
+                    dropZone.appendChild(imageData.container);
+                }
+            }
+        }
+    }
+
+    function clearAllTiers() {
+        document.querySelectorAll(".drop-zone").forEach(zone => {
+            while (zone.firstChild) {
+                const imgContainer = zone.firstChild;
+                uploadedImages.appendChild(imgContainer);
+            }
+        });
+    }
+
+    // Existing event handlers remain the same
+    function toggleSelection(event) {
+        const img = event.target;
+        if (selectedImages.has(img)) {
+            selectedImages.delete(img);
+            img.classList.remove("selected");
+        } else {
+            selectedImages.add(img);
+            img.classList.add("selected");
+        }
+    }
+
+    function toggleListened(event) {
+        const img = event.target;
+        img.dataset.listened = img.dataset.listened === "false" ? "true" : "false";
+        img.classList.toggle("listened", img.dataset.listened === "true");
+    }
+
+    function handleDragStart(event) {
+        event.dataTransfer.setData("text/plain", "dragging");
+    }
+
+    document.querySelectorAll(".drop-zone").forEach(zone => {
+        zone.addEventListener("dragover", function (event) {
+            event.preventDefault();
+        });
+        zone.addEventListener("drop", function (event) {
+            event.preventDefault();
+            selectedImages.forEach(img => {
+                zone.appendChild(img.parentElement);
+                img.classList.remove("selected");
+            });
+            selectedImages.clear();
+        });
+    });
+
+    searchInput.addEventListener("input", function () {
+        const query = searchInput.value.toLowerCase();
+        uploadedImageMap.forEach((data, name) => {
+            const container = data.container;
+            if (name.toLowerCase().includes(query)) {
+                container.style.display = "inline-block";
+            } else {
+                container.style.display = "none";
+            }
+        });
+    });
 });
