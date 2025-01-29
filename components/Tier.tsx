@@ -41,7 +41,6 @@ export default function Tier({
             image={image}
             onImageMove={onImageMove}
             onToggleListened={onToggleListened}
-            currentTierId={id}
             isSelected={selection[image.id] || false}
             onToggleSelection={onToggleSelection}
             selection={selection}
