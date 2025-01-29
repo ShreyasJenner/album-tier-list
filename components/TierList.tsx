@@ -24,7 +24,11 @@ const TierList = memo(function TierList({
     <>
       {tiers.map((tier) => {
         const tierId = `tier-${tier.toLowerCase()}`
-        const tierImages = (config[tierId] || []).map((id) => images.find((img) => img.id === id)).filter(Boolean)
+        // Filter out undefined values during the find operation
+        const tierImages = (config[tierId] || [])
+          .map((id) => images.find((img) => img.id === id))
+          .filter((img): img is { id: string; url: string; name: string; listened: boolean } => img !== undefined)
+
         return (
           <Tier
             key={tier}
