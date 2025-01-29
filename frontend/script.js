@@ -1,4 +1,4 @@
-// function to upload images and render them in upload area
+// Function to upload images and render them in the upload area
 document.getElementById('file-input').addEventListener('change', function (event) {
     const files = event.target.files;
     const uploadedImagesContainer = document.getElementById('uploaded-images');
@@ -56,6 +56,25 @@ document.getElementById('file-input').addEventListener('change', function (event
     }
 });
 
+// Search functionality
+document.getElementById('search-input').addEventListener('input', function (e) {
+    const searchTerm = e.target.value.toLowerCase(); // Get the search term
+    const images = document.querySelectorAll('.uploaded-image'); // Get all uploaded images
+
+    images.forEach(img => {
+        const fileName = img.alt.toLowerCase(); // Get the file name from the 'alt' attribute
+        const imageContainer = img.parentElement; // Get the parent container of the image
+
+        // Show or hide the image based on whether the file name matches the search term
+        if (fileName.includes(searchTerm)) {
+            imageContainer.style.display = 'inline-block'; // Show the image
+        } else {
+            imageContainer.style.display = 'none'; // Hide the image
+        }
+    });
+});
+
+// Drag and drop functions
 function allowDrop(event) {
     event.preventDefault();
 }
@@ -103,8 +122,7 @@ function drop(event) {
     }
 }
 
-
-// Save Configuration
+// Save and load configuration functions (unchanged)
 document.getElementById('save-config').addEventListener('click', function () {
     const tiers = document.querySelectorAll('.tier');
     const config = {};
@@ -134,7 +152,6 @@ document.getElementById('save-config').addEventListener('click', function () {
     URL.revokeObjectURL(url);
 });
 
-// Load Configuration
 document.getElementById('load-config').addEventListener('click', function () {
     document.getElementById('config-file-input').click();
 });
@@ -192,85 +209,3 @@ document.getElementById('config-file-input').addEventListener('change', function
 
     reader.readAsText(file);
 });
-
-
-// code for bulk select
-let selectedImages = new Set();
-
-document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('uploaded-image')) {
-        // Handle multi-select with Shift or Ctrl
-        if (e.shiftKey || e.ctrlKey) {
-            if (selectedImages.has(e.target)) {
-                // Deselect image
-                selectedImages.delete(e.target);
-                e.target.classList.remove('selected'); // Highlight removal
-            } else {
-                // Select image
-                selectedImages.add(e.target);
-                e.target.classList.add('selected'); // Highlight addition
-            }
-        } else {
-            // Single select (clears previous selection)
-            selectedImages.forEach(img => img.classList.remove('selected'));
-            selectedImages.clear();
-
-            selectedImages.add(e.target);
-            e.target.classList.add('selected');
-        }
-    }
-});
-
-selectedImages.forEach(image => {
-    image.setAttribute('draggable', 'true');
-});
-
-
-document.querySelectorAll('.drop-zone').forEach(dropZone => {
-    dropZone.addEventListener('dragover', (e) => e.preventDefault());
-
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-
-        selectedImages.forEach(image => {
-            // Create a clone of the image (to keep the original intact for future operations)
-            const imageClone = image.cloneNode(true);
-            imageClone.classList.remove('selected');
-            
-            // Create the image container for the drop zone
-            const imgContainer = document.createElement('div');
-            imgContainer.classList.add('image-container');
-
-            // Append the cloned image to the image container
-            imgContainer.appendChild(imageClone);
-
-            // Create a tooltip for the image
-            const tooltip = document.createElement('span');
-            tooltip.classList.add('tooltip');
-            tooltip.textContent = image.alt || "Uploaded Image"; // Tooltip text
-            imgContainer.appendChild(tooltip);
-
-            // Create a remove button for the image
-            const removeButton = document.createElement('button');
-            removeButton.classList.add('remove-button');
-            removeButton.textContent = 'X';
-            removeButton.onclick = function () {
-                imgContainer.remove(); // Remove the image container when clicked
-            };
-            imgContainer.appendChild(removeButton);
-
-            // Append the image container to the drop zone
-            dropZone.appendChild(imgContainer);
-
-            // Remove the original image from the uploaded section
-            image.parentElement.remove();
-
-            // Remove the highlight after the drop
-            image.classList.remove('selected');
-        });
-
-        // Clear the selected images after drop
-        selectedImages.clear();
-    });
-});
-

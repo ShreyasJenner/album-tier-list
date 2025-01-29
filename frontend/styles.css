@@ -30,6 +30,19 @@ body {
     border-radius: 5px;
 }
 
+.search-section {
+    width: 80%;
+    margin: 10px;
+}
+
+#search-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
 .tier {
     background-color: #fff;
     border: 2px solid #ccc;
@@ -56,12 +69,12 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    align-items: flex-start; /* Align items to the top */
+    align-items: flex-start;
 }
 
 .drop-zone img {
-    max-width: 100px; /* Constrain image width */
-    max-height: 100px; /* Constrain image height */
+    max-width: 100px;
+    max-height: 100px;
     border: 2px solid #ccc;
     border-radius: 8px;
     cursor: grab;
@@ -120,11 +133,11 @@ body {
     font-size: 12px;
     line-height: 20px;
     text-align: center;
-    display: none; /* Hidden by default */
+    display: none;
 }
 
 .image-container:hover .remove-button {
-    display: block; /* Show on hover */
+    display: block;
 }
 
 .tooltip {
@@ -136,12 +149,12 @@ body {
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 125%; /* Position above the image */
+    bottom: 125%;
     left: 50%;
     transform: translateX(-50%);
     opacity: 0;
     transition: opacity 0.3s;
-    white-space: nowrap; /* Prevent tooltip text from wrapping */
+    white-space: nowrap;
 }
 
 .image-container:hover .tooltip {
@@ -149,7 +162,6 @@ body {
     opacity: 1;
 }
 
-/* styles.css */
 .config-buttons {
     margin: 10px;
     display: flex;
