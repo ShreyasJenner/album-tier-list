@@ -34,7 +34,7 @@ def get_user_albums():
 
 # Function to download images
 def download_album_image(album, artist):
-    image_url = album['images'][0]['url'] if album['images'] else None
+    image_url = album['images'][1]['url'] if album['images'] else None
     if image_url:
         # Create a safe filename
         album_name = album['name'].replace('/', '-')
