@@ -232,17 +232,17 @@ document.addEventListener("DOMContentLoaded", function () {
         event.dataTransfer.setData("text/plain", "dragging");
     }
 
-    document.querySelectorAll(".drop-zone").forEach(zone => {
-        zone.addEventListener("dragover", function (event) {
-            event.preventDefault();
-        });
-        zone.addEventListener("drop", function (event) {
-            event.preventDefault();
-            selectedImages.forEach(img => {
-                zone.appendChild(img.parentElement);
-                img.classList.remove("selected");
-            });
-            selectedImages.clear();
+    // Add click event to tiers to move selected images
+    document.querySelectorAll(".tier").forEach(tier => {
+        tier.addEventListener("click", function (event) {
+            if (selectedImages.size > 0) {
+                const dropZone = tier.querySelector(".drop-zone");
+                selectedImages.forEach(img => {
+                    dropZone.appendChild(img.parentElement);
+                    img.classList.remove("selected");
+                });
+                selectedImages.clear();
+            }
         });
     });
 

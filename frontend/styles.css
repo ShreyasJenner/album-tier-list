@@ -64,6 +64,11 @@ body {
     padding: 10px;
     width: 80%;
     text-align: center;
+    cursor: pointer;
+}
+
+.tier:hover {
+  background-color: #f0f0f0;
 }
 
 .tier h2 {
